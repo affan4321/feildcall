@@ -57,16 +57,23 @@ exports.handler = async (event, context) => {
     // Forward the request to n8n webhook
     let n8nResponse;
     try {
+      console.log('Making request to n8n webhook:', 'https://disastershield.app.n8n.cloud/webhook/9013fe64-0429-4646-8fc3-18d4d16f6d22');
+      console.log('Request payload:', JSON.stringify(requestData, null, 2));
+      
       n8nResponse = await fetch('https://disastershield.app.n8n.cloud/webhook/9013fe64-0429-4646-8fc3-18d4d16f6d22', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'User-Agent': 'FieldCall-Netlify-Function/1.0',
         },
         body: JSON.stringify(requestData),
       });
       
       console.log('N8N response status:', n8nResponse.status);
       console.log('N8N response headers:', Object.fromEntries(n8nResponse.headers.entries()));
+      
+      // Log the response URL to make sure we're hitting the right endpoint
+      console.log('N8N response URL:', n8nResponse.url);
     } catch (fetchError) {
       console.error('Fetch error to n8n:', fetchError);
       return {
@@ -74,7 +81,8 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({ 
           error: 'Failed to connect to n8n webhook',
-          details: fetchError.message 
+          details: fetchError.message,
+          webhook_url: 'https://disastershield.app.n8n.cloud/webhook/9013fe64-0429-4646-8fc3-18d4d16f6d22'
         }),
       };
     }
@@ -84,6 +92,7 @@ exports.handler = async (event, context) => {
       console.error('N8N webhook failed:', {
         status: n8nResponse.status,
         statusText: n8nResponse.statusText
+        url: n8nResponse.url
       });
       
       let errorText = '';
@@ -95,11 +104,13 @@ exports.handler = async (event, context) => {
       }
       
       return {
-        statusCode: 500,
+        statusCode: 502, // Bad Gateway - more appropriate for upstream service errors
         headers,
         body: JSON.stringify({ 
-          error: `N8N webhook failed with status: ${n8nResponse.status}`,
-          details: errorText || n8nResponse.statusText
+          error: `N8N webhook returned ${n8nResponse.status}: ${n8nResponse.statusText}`,
+          details: errorText || n8nResponse.statusText,
+          webhook_url: 'https://disastershield.app.n8n.cloud/webhook/9013fe64-0429-4646-8fc3-18d4d16f6d22',
+          suggestion: n8nResponse.status === 404 ? 'Check if the n8n workflow is active and the webhook URL is correct' : 'Check n8n workflow configuration'
         }),
       };
     }
