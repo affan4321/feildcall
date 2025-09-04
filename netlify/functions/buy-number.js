@@ -91,7 +91,7 @@ exports.handler = async (event, context) => {
     if (!n8nResponse.ok) {
       console.error('N8N webhook failed:', {
         status: n8nResponse.status,
-        statusText: n8nResponse.statusText
+        statusText: n8nResponse.statusText,
         url: n8nResponse.url
       });
       
@@ -110,7 +110,9 @@ exports.handler = async (event, context) => {
           error: `N8N webhook returned ${n8nResponse.status}: ${n8nResponse.statusText}`,
           details: errorText || n8nResponse.statusText,
           webhook_url: 'https://disastershield.app.n8n.cloud/webhook/fcb55f6d-30f7-4ad9-ae68-d13335e63d98',
-          suggestion: n8nResponse.status === 404 ? 'Check if the n8n workflow is active and the webhook URL is correct' : 'Check n8n workflow configuration'
+          suggestion: n8nResponse.status === 404 ? 'Check if the n8n workflow is active and the webhook URL is correct' : 
+                     n8nResponse.status === 405 ? 'Check if the webhook HTTP method is set to POST' :
+                     'Check n8n workflow configuration'
         }),
       };
     }

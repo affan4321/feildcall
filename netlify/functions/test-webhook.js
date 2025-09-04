@@ -3,7 +3,7 @@ exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
   // Handle preflight requests
@@ -20,10 +20,13 @@ exports.handler = async (event, context) => {
   try {
     console.log('Testing webhook URL:', webhookUrl);
     
-    // Test with a simple payload
+    // Test with a realistic payload similar to what buy-number sends
     const testPayload = {
-      test: true,
-      message: 'Test from FieldCall webhook tester',
+      user_id: 'test-user-id',
+      email: 'test@example.com',
+      first_name: 'Test',
+      last_name: 'User',
+      company: 'Test Company',
       timestamp: new Date().toISOString()
     };
 
@@ -59,7 +62,10 @@ exports.handler = async (event, context) => {
         ok: response.ok,
         response_body: responseText,
         test_payload: testPayload,
-        message: response.ok ? 'Webhook is working!' : 'Webhook returned an error'
+        message: response.ok ? 'Webhook is working!' : `Webhook returned ${response.status}: ${response.statusText}`,
+        troubleshooting: response.status === 404 ? 'Check if n8n workflow is active and webhook method is set to POST' : 
+                        response.status === 405 ? 'Check if webhook HTTP method matches (should be POST)' :
+                        response.status >= 500 ? 'Server error in n8n workflow' : 'Unknown error'
       }),
     };
   } catch (error) {
@@ -71,7 +77,12 @@ exports.handler = async (event, context) => {
         error: 'Failed to test webhook',
         details: error.message,
         webhook_url: webhookUrl,
-        suggestion: 'Check if the webhook URL is correct and the n8n workflow is active'
+        suggestions: [
+          'Check if the webhook URL is correct',
+          'Ensure the n8n workflow is active/published',
+          'Verify the webhook HTTP method is set to POST',
+          'Check if there are any authentication requirements'
+        ]
       }),
     };
   }
