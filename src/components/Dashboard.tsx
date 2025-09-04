@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const { user, userProfile, signOut, loading, retell, fetchUserRetellNumber, fetchContactByEmail } = useAuth();
+    const { user, userProfile, signOut, loading, retell, hasAgentNumber, fetchUserRetellNumber, fetchContactByEmail } = useAuth();
     const navigate = useNavigate();
 
     // Refetch profile if user changes (robustness)
@@ -289,7 +289,7 @@ return (
                     </div>
 
                     <div className="text-center py-8">
-                        {!retell || retell === 'Not assigned yet' ? (
+                        {!hasAgentNumber && (!retell || retell === 'Not assigned yet') ? (
                             <div className="space-y-4">
                                 <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto">
                                     <Cog className="w-8 h-8 text-accent-500 animate-spin" />
@@ -318,7 +318,7 @@ return (
                                     </span>
                                 </div>
                                 
-                                {/* Buy Number Button - Only show when number is not assigned */}
+                                {/* Buy Number Button - Only show when user doesn't have agent number */}
                                 <div className="pt-4">
                                     <button
                                         onClick={handleBuyNumber}
@@ -443,7 +443,7 @@ return (
             </div>
 
             {/* Agent Customization Form - Only show when number is assigned */}
-            {retell && retell !== 'Not assigned yet' && (
+            {hasAgentNumber && retell && retell !== 'Not assigned yet' && (
                 <div className="mb-8">
                     <div className="bg-white rounded-2xl p-6 shadow-medium border border-gray-200 hover:shadow-strong transition-all duration-300">
                         <form onSubmit={handleSubmit}>

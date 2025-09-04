@@ -117,7 +117,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Get response from n8n (if any)
+    // Get response from n8n - this should contain the phone number
     let n8nData = {};
     try {
       const responseText = await n8nResponse.text();
@@ -127,6 +127,37 @@ exports.handler = async (event, context) => {
         try {
           n8nData = JSON.parse(responseText);
           console.log('N8N parsed response:', n8nData);
+          
+          // If n8n returns success and phone number, save it to Supabase
+          if (n8nData.success && n8nData.phoneNumber) {
+            console.log('N8N returned phone number, saving to Supabase...');
+            
+            // Call our save-agent-number function
+            try {
+              const saveResponse = await fetch(`${process.env.URL || 'https://fieldcall.ai'}/.netlify/functions/save-agent-number`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  ...n8nData,
+                  user_id: requestData.user_id,
+                  email: requestData.email
+                }),
+              });
+              
+              const saveResult = await saveResponse.json();
+              console.log('Save agent number result:', saveResult);
+              
+              if (!saveResponse.ok) {
+                console.error('Failed to save agent number:', saveResult);
+                // Don't fail the whole request, just log the error
+              }
+            } catch (saveError) {
+              console.error('Error calling save-agent-number function:', saveError);
+              // Don't fail the whole request, just log the error
+            }
+          }
         } catch (parseError) {
           console.log('N8N response is not JSON, treating as text:', responseText);
           n8nData = { message: responseText };

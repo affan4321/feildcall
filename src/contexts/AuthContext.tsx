@@ -6,6 +6,7 @@ interface AuthContextType {
   userProfile: any | null
   loading: boolean
   retell: string | null
+  hasAgentNumber: boolean
   fetchContactByEmail: (string)=> Promise<any>
   fetchUserRetellNumber: () => Promise<void>
   signUp: (email: string, password: string, profileData: any) => Promise<{ error: any }>
@@ -30,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
   const [retell, setRetell] = useState(null)
+  const [hasAgentNumber, setHasAgentNumber] = useState(false)
   // Auto-logout functionality
   useEffect(() => {
     let inactivityTimer: NodeJS.Timeout
@@ -120,6 +122,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return null
       }
       setUserProfile(data)
+      setHasAgentNumber(data?.has_agent_number || false)
+      if (data?.agent_number) {
+        setRetell(data.agent_number)
+      }
       return data
     } catch (error) {
       console.error('Error fetching user profile:', error)
@@ -140,6 +146,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return null
       }
       setUserProfile(data)
+      setHasAgentNumber(data?.has_agent_number || false)
+      if (data?.agent_number) {
+        setRetell(data.agent_number)
+      }
       return data
     } catch (error) {
       console.error('Error fetching user profile by email:', error)
@@ -254,6 +264,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
 const fetchUserRetellNumber = async () => {
+  // First check if user has agent number in Supabase
+  if (userProfile?.has_agent_number && userProfile?.agent_number) {
+    setRetell(userProfile.agent_number);
+    setHasAgentNumber(true);
+    return;
+  }
+
   if (!userProfile?.email) return;
 
   const url = 'https://services.leadconnectorhq.com/contacts/?locationId=yyTbibKYQhtCYuKKsjbN';
@@ -274,6 +291,18 @@ const fetchUserRetellNumber = async () => {
     const field = user?.customFields?.find((f) => f.id === 'Znuo3CRbsgviZTDokZyH');
     const retell_number = field?.value || 'Not assigned yet';
     setRetell(retell_number);
+    
+    // If we found a number from GoHighLevel, update Supabase
+    if (retell_number && retell_number !== 'Not assigned yet') {
+      setHasAgentNumber(true);
+      // Optionally update Supabase with this number if not already set
+      if (!userProfile?.has_agent_number) {
+        updateProfile({
+          agent_number: retell_number,
+          has_agent_number: true
+        });
+      }
+    }
   } catch (error) {
     console.error('Failed to fetch retell number:', error);
   }
@@ -303,6 +332,7 @@ const options = {
     user,
     userProfile,
     loading,
+    hasAgentNumber,
     signUp,
     signIn,
     signOut,
