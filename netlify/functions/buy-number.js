@@ -26,6 +26,9 @@ exports.handler = async (event, context) => {
   try {
     const requestData = JSON.parse(event.body);
 
+    // Log the payload being sent for debugging
+    console.log('Payload being sent to n8n webhook:', JSON.stringify(requestData, null, 2));
+
     // Validate required data
     if (!requestData.user_id || !requestData.email) {
       return {

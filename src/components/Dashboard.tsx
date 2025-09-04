@@ -50,20 +50,24 @@ const Dashboard = () => {
         setBuyNumberStatus('idle');
         setBuyNumberMessage('');
 
+        const payload = {
+            user_id: user?.id,
+            email: userProfile?.email,
+            first_name: userProfile?.first_name,
+            last_name: userProfile?.last_name,
+            company: userProfile?.company,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log('Sending payload to buy-number function:', payload);
+
         try {
             const response = await fetch('/.netlify/functions/buy-number', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    user_id: user?.id,
-                    email: userProfile?.email,
-                    first_name: userProfile?.first_name,
-                    last_name: userProfile?.last_name,
-                    company: userProfile?.company,
-                    timestamp: new Date().toISOString()
-                }),
+                body: JSON.stringify(payload),
             });
 
             const result = await response.json();
