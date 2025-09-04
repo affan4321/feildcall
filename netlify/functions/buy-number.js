@@ -23,6 +23,7 @@ exports.handler = async (event, context) => {
     };
   }
 
+  try {
     // Forward the request to n8n webhook
     let n8nResponse;
     try {
@@ -33,13 +34,12 @@ exports.handler = async (event, context) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-      console.log('Success! N8N workflow initiated, phone number will be saved via HTTP Request node');
         },
         body: JSON.stringify(requestData),
       });
       
+      console.log('Success! N8N workflow initiated, phone number will be saved via HTTP Request node');
       console.log('N8N response status:', n8nResponse.status);
-          message: 'Number purchase request submitted successfully. Your phone number will be assigned within a few minutes.',
       
       // Log the response URL to make sure we're hitting the right endpoint
       console.log('N8N response URL:', n8nResponse.url);
