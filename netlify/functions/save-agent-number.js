@@ -64,18 +64,19 @@ exports.handler = async (event, context) => {
     // Initialize Supabase client
     const { createClient } = require('@supabase/supabase-js');
     
-    if (!process.env.VITE_SUPABASE_URL || !process.env.VITE_SUPABASE_ANON_KEY) {
+    if (!process.env.VITE_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Supabase environment variables not configured');
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'Supabase not configured' }),
+        body: JSON.stringify({ error: 'Supabase service role key not configured' }),
       };
     }
 
+    // Use service role key to bypass RLS for server-side operations
     const supabase = createClient(
       process.env.VITE_SUPABASE_URL,
-      process.env.VITE_SUPABASE_ANON_KEY
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
     // Update user profile with agent number
