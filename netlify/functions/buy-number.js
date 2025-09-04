@@ -24,6 +24,29 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Parse the request body first
+    let requestData;
+    try {
+      requestData = JSON.parse(event.body);
+      console.log('Received request data:', JSON.stringify(requestData, null, 2));
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Invalid JSON in request body' }),
+      };
+    }
+
+    // Validate required fields
+    if (!requestData.user_id || !requestData.email) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Missing required fields: user_id and email are required' }),
+      };
+    }
+
     // Forward the request to n8n webhook
     let n8nResponse;
     try {
