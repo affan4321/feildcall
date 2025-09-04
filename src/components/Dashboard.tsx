@@ -56,6 +56,9 @@ const Dashboard = () => {
             first_name: userProfile?.first_name,
             last_name: userProfile?.last_name,
             company: userProfile?.company,
+            state: userProfile?.state,
+            city: userProfile?.city,
+            zip_code: userProfile?.zip_code,
             timestamp: new Date().toISOString()
         };
 

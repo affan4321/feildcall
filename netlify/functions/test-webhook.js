@@ -27,6 +27,9 @@ exports.handler = async (event, context) => {
       first_name: 'Test',
       last_name: 'User',
       company: 'Test Company',
+      state: 'Florida',
+      city: 'Miami',
+      zip_code: '33101',
       timestamp: new Date().toISOString()
     };
 
