@@ -39,10 +39,18 @@ exports.handler = async (event, context) => {
     }
 
     // Validate required data from n8n HTTP Request node
-    if (!requestData.phoneNumber || !requestData.user_id) {
+    // Clean the data - n8n sometimes sends values with "=" prefix
+    const cleanedData = {
+      phoneNumber: requestData.phoneNumber?.toString().replace(/^=/, '') || '',
+      user_id: requestData.user_id?.toString().replace(/^=/, '') || '',
+      friendlyName: requestData.friendlyName?.toString().replace(/^=/, '') || ''
+    };
+
+    if (!cleanedData.phoneNumber || !cleanedData.user_id) {
       console.error('Missing required fields from n8n:', { 
-        phoneNumber: !!requestData.phoneNumber,
-        user_id: !!requestData.user_id
+        phoneNumber: !!cleanedData.phoneNumber,
+        user_id: !!cleanedData.user_id,
+        originalData: requestData
       });
       return {
         statusCode: 400,
@@ -72,19 +80,19 @@ exports.handler = async (event, context) => {
 
     // Update user profile with agent number
     console.log('Updating user profile with agent number:', {
-      user_id: requestData.user_id,
-      phoneNumber: requestData.phoneNumber,
-      friendlyName: requestData.friendlyName
+      user_id: cleanedData.user_id,
+      phoneNumber: cleanedData.phoneNumber,
+      friendlyName: cleanedData.friendlyName
     });
 
     const { data, error } = await supabase
       .from('user_profiles')
       .update({
-        agent_number: requestData.phoneNumber,
+        agent_number: cleanedData.phoneNumber,
         has_agent_number: true,
         updated_at: new Date().toISOString()
       })
-      .eq('id', requestData.user_id)
+      .eq('id', cleanedData.user_id)
       .select();
 
     if (error) {
@@ -100,13 +108,13 @@ exports.handler = async (event, context) => {
     }
 
     if (!data || data.length === 0) {
-      console.error('No user found with ID:', requestData.user_id);
+      console.error('No user found with ID:', cleanedData.user_id);
       return {
         statusCode: 404,
         headers,
         body: JSON.stringify({ 
           error: 'User not found',
-          user_id: requestData.user_id 
+          user_id: cleanedData.user_id 
         }),
       };
     }
@@ -120,9 +128,9 @@ exports.handler = async (event, context) => {
         success: true,
         message: 'Agent number saved successfully',
         data: {
-          user_id: requestData.user_id,
-          agent_number: requestData.phoneNumber,
-          friendly_name: requestData.friendlyName,
+          user_id: cleanedData.user_id,
+          agent_number: cleanedData.phoneNumber,
+          friendly_name: cleanedData.friendlyName,
           updated_profile: data[0]
         }
       }),
