@@ -77,11 +77,11 @@ const Dashboard = () => {
 
             if (response.ok) {
                 setBuyNumberStatus('success');
-                setBuyNumberMessage(result.message || 'Number purchase request submitted successfully!');
+                setBuyNumberMessage(result.message || 'Number purchase request submitted successfully! Your phone number will be assigned within a few minutes.');
                 // Refresh the retell number after a short delay
                 setTimeout(() => {
                     fetchUserRetellNumber();
-                }, 2000);
+                }, 5000); // Give n8n workflow time to complete
             } else {
                 throw new Error(result.error || 'Failed to submit number purchase request');
             }
@@ -95,7 +95,7 @@ const Dashboard = () => {
             setTimeout(() => {
                 setBuyNumberStatus('idle');
                 setBuyNumberMessage('');
-            }, 5000);
+            }, 8000); // Longer timeout to show success message
         }
     };
 

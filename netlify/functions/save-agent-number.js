@@ -24,7 +24,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Parse request body from n8n
+    // Parse request body from n8n HTTP Request node
     let requestData;
     try {
       requestData = JSON.parse(event.body);
@@ -38,10 +38,9 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Validate required data from n8n
-    if (!requestData.success || !requestData.phoneNumber || !requestData.user_id) {
+    // Validate required data from n8n HTTP Request node
+    if (!requestData.phoneNumber || !requestData.user_id) {
       console.error('Missing required fields from n8n:', { 
-        success: !!requestData.success,
         phoneNumber: !!requestData.phoneNumber,
         user_id: !!requestData.user_id
       });
@@ -49,19 +48,7 @@ exports.handler = async (event, context) => {
         statusCode: 400,
         headers,
         body: JSON.stringify({ 
-          error: 'Missing required fields: success, phoneNumber, and user_id are required' 
-        }),
-      };
-    }
-
-    // Only proceed if n8n reports success
-    if (!requestData.success) {
-      console.error('N8N reported failure:', requestData);
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Phone number purchase was not successful according to n8n workflow' 
+          error: 'Missing required fields: phoneNumber and user_id are required' 
         }),
       };
     }

@@ -23,37 +23,6 @@ exports.handler = async (event, context) => {
     };
   }
 
-  try {
-    // Parse request body
-    let requestData;
-    try {
-      requestData = JSON.parse(event.body);
-      console.log('Parsed request data:', JSON.stringify(requestData, null, 2));
-    } catch (parseError) {
-      console.error('Failed to parse request body:', parseError);
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Invalid JSON in request body' }),
-      };
-    }
-
-    // Validate required data
-    if (!requestData.user_id || !requestData.email) {
-      console.error('Missing required fields:', { 
-        user_id: !!requestData.user_id, 
-        email: !!requestData.email 
-      });
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing required fields: user_id and email' }),
-      };
-    }
-
-    // Log the payload being sent for debugging
-    console.log('Payload being sent to n8n webhook:', JSON.stringify(requestData, null, 2));
-
     // Forward the request to n8n webhook
     let n8nResponse;
     try {
@@ -64,13 +33,13 @@ exports.handler = async (event, context) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'FieldCall-Netlify-Function/1.0',
+      console.log('Success! N8N workflow initiated, phone number will be saved via HTTP Request node');
         },
         body: JSON.stringify(requestData),
       });
       
       console.log('N8N response status:', n8nResponse.status);
-      console.log('N8N response headers:', Object.fromEntries(n8nResponse.headers.entries()));
+          message: 'Number purchase request submitted successfully. Your phone number will be assigned within a few minutes.',
       
       // Log the response URL to make sure we're hitting the right endpoint
       console.log('N8N response URL:', n8nResponse.url);
