@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const webhookUrl = 'https://disastershield.app.n8n.cloud/webhook/9013fe64-0429-4646-8fc3-18d4d16f6d22';
+  const webhookUrl = 'https://disastershield.app.n8n.cloud/webhook/fcb55f6d-30f7-4ad9-ae68-d13335e63d98';
 
   try {
     console.log('Testing webhook URL:', webhookUrl);
