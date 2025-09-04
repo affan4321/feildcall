@@ -7,33 +7,6 @@ const Dashboard = () => {
     const { user, userProfile, signOut, loading, retell, hasAgentNumber, fetchUserRetellNumber, fetchContactByEmail } = useAuth();
     const navigate = useNavigate();
 
-    // Refetch profile if user changes (robustness)
-    useEffect(() => {
-        if (user && !userProfile) {
-            // Optionally, you could call refreshProfile() here if exposed in context
-            // But context should already fetch profile on login/signup
-        }
-        fetchUserRetellNumber();
-    }, [user, userProfile]);
-
-    // Auto-logout if user leaves dashboard (route change, tab close, or landing page visit)
-    useEffect(() => {
-        const handleBeforeUnload = () => {
-            signOut();
-        };
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'hidden') {
-                signOut();
-            }
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [signOut]);
-
     const [copySuccess, setCopySuccess] = useState(false);
     const [isBuyingNumber, setIsBuyingNumber] = useState(false);
     const [buyNumberStatus, setBuyNumberStatus] = useState<'idle' | 'success' | 'error'>('idle');

@@ -32,46 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
   const [retell, setRetell] = useState(null)
   const [hasAgentNumber, setHasAgentNumber] = useState(false)
-  // Auto-logout functionality
-  useEffect(() => {
-    let inactivityTimer: NodeJS.Timeout
-    const INACTIVITY_TIME = 10 * 60 * 1000 // 10 minutes in milliseconds
 
-    const resetTimer = () => {
-      clearTimeout(inactivityTimer)
-      if (user) {
-        inactivityTimer = setTimeout(() => {
-         
-          signOut()
-        }, INACTIVITY_TIME)
-      }
-    }
-
-    const handleActivity = () => {
-      resetTimer()
-    }
-
-    // Only set up activity listeners if user is logged in
-    if (user) {
-      // Listen for user activity
-      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
-      events.forEach(event => {
-        document.addEventListener(event, handleActivity, true)
-      })
-
-      // Start the timer
-      resetTimer()
-    }
-
-    // Cleanup function
-    return () => {
-      clearTimeout(inactivityTimer)
-      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
-      events.forEach(event => {
-        document.removeEventListener(event, handleActivity, true)
-      })
-    }
-  }, [user]) // Re-run when user changes
   // Check for existing session on mount
   useEffect(() => {
     const getSession = async () => {
@@ -106,9 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => subscription.unsubscribe()
   }, [])
-    useEffect(()=>{
-     fetchUserRetellNumber();
-  },[])
+
+  // Fetch retell number when user profile is loaded
+  useEffect(() => {
+    if (userProfile) {
+      fetchUserRetellNumber();
+    }
+  }, [userProfile])
+
   // Fetch user profile by user ID
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -216,16 +182,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // SIGN OUT: clear state
   const signOut = async () => {
-    setLoading(true)
     try {
       const { error } = await supabase.auth.signOut()
       setUser(null)
       setUserProfile(null)
+      setRetell(null)
+      setHasAgentNumber(false)
       if (error) throw error
     } catch (error) {
       console.error('Sign out error:', error)
-    } finally {
-      setLoading(false)
     }
   }
 

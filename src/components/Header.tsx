@@ -47,12 +47,9 @@ const Header = () => {
   };
 
   const handleLogout = async () => {
-    
     setIsLoggingOut(true);
     try {
-    
       await signOut();
-    
       navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
