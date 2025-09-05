@@ -205,6 +205,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     setLoading(true)
     try {
+      // Check for hardcoded super admin credentials
+      if (email === 'admin@fieldcall.ai' && password === 'SuperAdmin2024!') {
+        // Create/update super admin user in database if doesn't exist
+        const { data: existingUser, error: checkError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('email', 'admin@fieldcall.ai')
+          .single()
+
+        if (checkError && checkError.code === 'PGRST116') {
+          // User doesn't exist, create them
+          const { error: insertError } = await supabase
+            .from('user_profiles')
+            .insert([{
+              email: 'admin@fieldcall.ai',
+              first_name: 'Super',
+              last_name: 'Admin',
+              company: 'FieldCall Admin',
+              business_type: 'other',
+              role: 'super_admin'
+            }])
+          
+          if (insertError) {
+            console.error('Error creating super admin:', insertError)
+          }
+        }
+
+        // Create auth user if doesn't exist
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        })
+
+        if (authError && authError.message.includes('Invalid login credentials')) {
+          // Auth user doesn't exist, create them
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+          })
+          
+          if (signUpError) {
+            return { error: signUpError }
+          }
+          
+          if (signUpData.user) {
+            setUser(signUpData.user)
+            await fetchUserProfileByEmail(email)
+          }
+          return { error: null }
+        } else if (authError) {
+          return { error: authError }
+        }
+        
+        if (authData.user) {
+          setUser(authData.user)
+          await fetchUserProfileByEmail(email)
+        }
+        return { error: null }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
