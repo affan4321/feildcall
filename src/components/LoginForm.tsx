@@ -134,6 +134,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ isOpen, onClose }) => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-8">
             <div className="space-y-6">
+              {/* Super Admin Info */}
+              <div className="bg-accent-50 border border-accent-200 rounded-xl p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-4 h-4 text-accent-600">👑</div>
+                  <h4 
+                    className="text-sm font-bold text-accent-800"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Super Admin Access
+                  </h4>
+                </div>
+                <p 
+                  className="text-xs text-accent-700"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  Use <strong>admin@fieldcall.ai</strong> with password <strong>SuperAdmin2024!</strong> for admin dashboard access.
+                </p>
+              </div>
+
               {/* Email Field */}
               <div>
                 <label 

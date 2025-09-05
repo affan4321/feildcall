@@ -147,6 +147,50 @@ const Header = () => {
                 >
                   Sign In
                 </button>
+                <button 
+                  onClick={() => {
+                    // Auto-fill admin credentials and open login modal
+                    setIsLoginModalOpen(true);
+                    // Small delay to ensure modal is open
+                    setTimeout(() => {
+                      const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement;
+                      const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement;
+                      if (emailInput && passwordInput) {
+                        emailInput.value = 'admin@fieldcall.ai';
+                        passwordInput.value = 'SuperAdmin2024!';
+                        // Trigger change events
+                        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+                      }
+                    }, 100);
+                  }}
+                  className="px-4 py-2 text-xs bg-accent-100 text-accent-700 font-bold rounded-lg hover:bg-accent-200 transition-all duration-200 hover:scale-105 flex items-center space-x-1"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  <span>👑</span>
+                  <span>Admin</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsLoginModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                    // Auto-fill admin credentials
+                    setTimeout(() => {
+                      const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement;
+                      const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement;
+                      if (emailInput && passwordInput) {
+                        emailInput.value = 'admin@fieldcall.ai';
+                        passwordInput.value = 'SuperAdmin2024!';
+                        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+                      }
+                    }, 100);
+                  }}
+                  className="block w-full text-center bg-accent-100 text-accent-700 font-bold py-3 px-4 rounded-lg hover:bg-accent-200 transition-all duration-200 hover:scale-105"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  👑 Admin Login
+                </button>
                 <a 
                   href="tel:+18884409613"
                   className="px-6 py-2 text-primary-900 font-bold hover:text-accent-500 transition-all duration-200 hover:scale-105"
