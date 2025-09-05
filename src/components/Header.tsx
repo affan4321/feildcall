@@ -50,9 +50,14 @@ const Header = () => {
     setIsLoggingOut(true);
     try {
       await signOut();
+      // Force navigation after logout
       navigate('/');
+      // Force page reload to ensure clean state
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
+      // Even if logout fails, redirect to home
+      window.location.href = '/';
     } finally {
       setIsLoggingOut(false);
     }

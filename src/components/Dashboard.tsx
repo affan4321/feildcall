@@ -20,6 +20,7 @@ const Dashboard = () => {
     const [isBuyingNumber, setIsBuyingNumber] = useState(false);
     const [buyNumberStatus, setBuyNumberStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [buyNumberMessage, setBuyNumberMessage] = useState('');
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [formData, setFormData] = useState({
         voiceModel: 'eleven_labs_adriel',
         sttModel: 'deepgram_nova_2',
@@ -109,8 +110,10 @@ const Dashboard = () => {
     };
 
     const handleLogout = async () => {
+        setIsLoggingOut(true);
         await signOut();
-        navigate('/');
+        // Force navigation and page reload for clean logout
+        window.location.href = '/';
     };
 
 
@@ -238,11 +241,21 @@ return (
                         </button>
                         <button
                             onClick={handleLogout}
+                            disabled={isLoggingOut}
                             className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                             style={{ fontFamily: 'Inter, sans-serif' }}
                         >
-                            <LogOut className="w-4 h-4" />
-                            <span className="hidden sm:inline">Logout</span>
+                            {isLoggingOut ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                    <span className="hidden sm:inline">Logging out...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <LogOut className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Logout</span>
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

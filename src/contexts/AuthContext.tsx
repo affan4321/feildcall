@@ -46,9 +46,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await fetchUserProfile(session.user.id)
         } else {
           console.log('AuthContext: No session found');
+          // Ensure clean state when no session
+          setUser(null)
+          setUserProfile(null)
+          setRetell(null)
+          setHasAgentNumber(false)
         }
       } catch (error) {
         console.error('Error getting session:', error)
+        // Clear state on error
+        setUser(null)
+        setUserProfile(null)
+        setRetell(null)
+        setHasAgentNumber(false)
       } finally {
         console.log('AuthContext: Setting loading to false');
         setLoading(false)
@@ -61,12 +71,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('AuthContext: Auth state changed:', event, session);
+        
+        if (event === 'SIGNED_OUT' || !session?.user) {
+          // Immediate cleanup on sign out
+          setUser(null)
+          setUserProfile(null)
+          setRetell(null)
+          setHasAgentNumber(false)
+          setLoading(false)
+          return
+        }
+        
         if (session?.user) {
           setUser(session.user)
           await fetchUserProfile(session.user.id)
         } else {
           setUser(null)
           setUserProfile(null)
+          setRetell(null)
+          setHasAgentNumber(false)
         }
         setLoading(false)
       }
@@ -191,15 +214,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // SIGN OUT: clear state
   const signOut = async () => {
+    setLoading(true)
     try {
-      const { error } = await supabase.auth.signOut()
+      // Clear local state first to provide immediate feedback
       setUser(null)
       setUserProfile(null)
       setRetell(null)
       setHasAgentNumber(false)
-      if (error) throw error
+      
+      // Then sign out from Supabase
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error('Supabase sign out error:', error)
+        // Even if Supabase signout fails, we've cleared local state
+        // This ensures the user appears logged out in the UI
+      }
+      
+      // Clear any cached data
+      localStorage.clear()
+      sessionStorage.clear()
+      
     } catch (error) {
       console.error('Sign out error:', error)
+      // Ensure state is cleared even if there's an error
+      setUser(null)
+      setUserProfile(null)
+      setRetell(null)
+      setHasAgentNumber(false)
+    } finally {
+      setLoading(false)
     }
   }
 

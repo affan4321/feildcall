@@ -12,6 +12,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   console.log('ProtectedRoute: State check', { user: !!user, loading });
 
+  // Add effect to handle auth state changes
+  React.useEffect(() => {
+    if (!loading && !user) {
+      console.log('ProtectedRoute: No user detected, redirecting to home');
+    }
+  }, [user, loading]);
   if (loading) {
     console.log('ProtectedRoute: Showing loading state');
     return (
