@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import LoginForm from './LoginForm';
 
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -97,6 +97,15 @@ const Header = () => {
             {user ? (
               // Show Dashboard and Logout buttons when logged in
               <>
+                {(isAdmin || isSuperAdmin) && (
+                  <button 
+                    onClick={() => navigate('/admin')}
+                    className="px-6 py-2 text-primary-900 font-bold hover:text-accent-500 transition-all duration-200 hover:scale-105"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Admin
+                  </button>
+                )}
                 <button 
                   onClick={handleDashboard}
                   className="px-6 py-2 text-primary-900 font-bold hover:text-accent-500 transition-all duration-200 hover:scale-105"
@@ -176,6 +185,18 @@ const Header = () => {
               {user ? (
                 // Show Logout button when logged in (mobile)
                 <>
+                  {(isAdmin || isSuperAdmin) && (
+                    <button 
+                      onClick={() => {
+                        navigate('/admin');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-center text-primary-900 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:scale-105"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      👑 Admin Panel
+                    </button>
+                  )}
                   <button 
                     onClick={() => {
                       handleDashboard();

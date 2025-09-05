@@ -16,37 +16,46 @@ import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import StickyMobileCTA from './components/StickyMobileCTA';
 import Dashboard from './components/Dashboard';
+import AdminDashboard from './components/AdminDashboard';
+import RoleBasedRedirect from './components/RoleBasedRedirect';
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen">
-            <Routes>
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/" element={
-                <>
-                  <Header />
-                  <Hero />
-                  <HowItWorks />
-                  <WhyFieldCall />
-                  <DemoBanner />
-                  <Pricing />
-                  <Testimonials />
-                  <FAQ />
-                  <FinalCTA />
-                  <Footer />
-                  <StickyMobileCTA />
-                </>
-              } />
-            </Routes>
-          </div>
+          <RoleBasedRedirect>
+            <div className="min-h-screen">
+              <Routes>
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/" element={
+                  <>
+                    <Header />
+                    <Hero />
+                    <HowItWorks />
+                    <WhyFieldCall />
+                    <DemoBanner />
+                    <Pricing />
+                    <Testimonials />
+                    <FAQ />
+                    <FinalCTA />
+                    <Footer />
+                    <StickyMobileCTA />
+                  </>
+                } />
+              </Routes>
+            </div>
+          </RoleBasedRedirect>
         </Router>
       </AuthProvider>
     </ErrorBoundary>

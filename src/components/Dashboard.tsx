@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const { user, userProfile, signOut, loading, retell, hasAgentNumber, fetchUserRetellNumber, fetchContactByEmail } = useAuth();
+    const { user, userProfile, signOut, loading, retell, hasAgentNumber, fetchUserRetellNumber, fetchContactByEmail, isAdmin, isSuperAdmin } = useAuth();
     const navigate = useNavigate();
 
     // Add debugging
@@ -236,6 +236,17 @@ return (
                     </div>
 
                     <div className="flex items-center space-x-4">
+                        {(isAdmin || isSuperAdmin) && (
+                            <button 
+                                onClick={() => navigate('/admin')}
+                                className="p-2 text-gray-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                                title="Admin Dashboard"
+                            >
+                                <div className="flex items-center space-x-1">
+                                    <div className="w-5 h-5 text-accent-500">👑</div>
+                                </div>
+                            </button>
+                        )}
                         <button className="p-2 text-gray-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition-all duration-200">
                             <Settings className="w-5 h-5" />
                         </button>

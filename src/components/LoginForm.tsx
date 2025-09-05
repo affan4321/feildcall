@@ -11,6 +11,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { isAdmin, isSuperAdmin } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -60,7 +61,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ isOpen, onClose }) => {
         clearTimeout(timeoutId);
         setSubmitStatus('success');
         onClose();
-        navigate('/dashboard');
+        // Redirect based on user role after successful login
+        setTimeout(() => {
+          // We need to wait a moment for the auth context to update with user profile
+          window.location.href = '/dashboard'; // This will trigger a page reload and proper role detection
+        }, 500);
       }
     } catch (error) {
       console.error('Login error caught:', error);

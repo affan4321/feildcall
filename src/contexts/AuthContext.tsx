@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 interface AuthContextType {
   user: any | null
   userProfile: any | null
+  isAdmin: boolean
+  isSuperAdmin: boolean
   loading: boolean
   retell: string | null
   hasAgentNumber: boolean
@@ -32,6 +34,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
   const [retell, setRetell] = useState(null)
   const [hasAgentNumber, setHasAgentNumber] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
 
   // Check for existing session on mount
   useEffect(() => {
@@ -78,6 +82,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUserProfile(null)
           setRetell(null)
           setHasAgentNumber(false)
+          setIsAdmin(false)
+          setIsSuperAdmin(false)
           setLoading(false)
           return
         }
@@ -90,6 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUserProfile(null)
           setRetell(null)
           setHasAgentNumber(false)
+          setIsAdmin(false)
+          setIsSuperAdmin(false)
         }
         setLoading(false)
       }
@@ -121,6 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('AuthContext: Profile fetched:', data);
       setUserProfile(data)
       setHasAgentNumber(data?.has_agent_number || false)
+      setIsAdmin(data?.role === 'admin' || data?.role === 'super_admin')
+      setIsSuperAdmin(data?.role === 'super_admin')
       if (data?.agent_number) {
         setRetell(data.agent_number)
       }
@@ -145,6 +155,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setUserProfile(data)
       setHasAgentNumber(data?.has_agent_number || false)
+      setIsAdmin(data?.role === 'admin' || data?.role === 'super_admin')
+      setIsSuperAdmin(data?.role === 'super_admin')
       if (data?.agent_number) {
         setRetell(data.agent_number)
       }
@@ -221,6 +233,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(null)
       setRetell(null)
       setHasAgentNumber(false)
+      setIsAdmin(false)
+      setIsSuperAdmin(false)
       
       // Then sign out from Supabase
       const { error } = await supabase.auth.signOut()
@@ -242,6 +256,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(null)
       setRetell(null)
       setHasAgentNumber(false)
+      setIsAdmin(false)
+      setIsSuperAdmin(false)
     } finally {
       setLoading(false)
     }
@@ -349,6 +365,8 @@ const options = {
   const value = {
     user,
     userProfile,
+    isAdmin,
+    isSuperAdmin,
     loading,
     hasAgentNumber,
     signUp,
@@ -365,4 +383,4 @@ const options = {
 
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-} 
+}
