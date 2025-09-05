@@ -37,14 +37,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const getSession = async () => {
       try {
+        console.log('AuthContext: Getting session...');
         const { data: { session } } = await supabase.auth.getSession()
+        console.log('AuthContext: Session data:', session);
         if (session?.user) {
+          console.log('AuthContext: User found, fetching profile...');
           setUser(session.user)
           await fetchUserProfile(session.user.id)
+        } else {
+          console.log('AuthContext: No session found');
         }
       } catch (error) {
         console.error('Error getting session:', error)
       } finally {
+        console.log('AuthContext: Setting loading to false');
         setLoading(false)
       }
     }
@@ -54,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('AuthContext: Auth state changed:', event, session);
         if (session?.user) {
           setUser(session.user)
           await fetchUserProfile(session.user.id)
@@ -78,6 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Fetch user profile by user ID
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('AuthContext: Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -87,6 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error fetching profile:', error)
         return null
       }
+      console.log('AuthContext: Profile fetched:', data);
       setUserProfile(data)
       setHasAgentNumber(data?.has_agent_number || false)
       if (data?.agent_number) {

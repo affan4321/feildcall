@@ -7,6 +7,15 @@ const Dashboard = () => {
     const { user, userProfile, signOut, loading, retell, hasAgentNumber, fetchUserRetellNumber, fetchContactByEmail } = useAuth();
     const navigate = useNavigate();
 
+    // Add debugging
+    console.log('Dashboard: Render state:', {
+        user: !!user,
+        userProfile: !!userProfile,
+        loading,
+        retell,
+        hasAgentNumber
+    });
+
     const [copySuccess, setCopySuccess] = useState(false);
     const [isBuyingNumber, setIsBuyingNumber] = useState(false);
     const [buyNumberStatus, setBuyNumberStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -152,6 +161,7 @@ const handleInputChange = (field: string, value: string) => {
 };
 
 if (loading) {
+    console.log('Dashboard: Showing loading state');
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
             <div className="text-center">
@@ -163,6 +173,15 @@ if (loading) {
         </div>
     );
 }
+
+// Add safety check for user
+if (!user) {
+    console.log('Dashboard: No user found, redirecting to home');
+    navigate('/');
+    return null;
+}
+
+console.log('Dashboard: Rendering main dashboard');
 
 const getPlanDetails = (planId: string) => {
     const plans = {

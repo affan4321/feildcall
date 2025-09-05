@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import SignupPage from './pages/SignupPage';
 import Header from './components/Header';
@@ -18,35 +19,37 @@ import Dashboard from './components/Dashboard';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen">
-          <Routes>
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/" element={
-              <>
-                <Header />
-                <Hero />
-                <HowItWorks />
-                <WhyFieldCall />
-                <DemoBanner />
-                <Pricing />
-                <Testimonials />
-                <FAQ />
-                <FinalCTA />
-                <Footer />
-                <StickyMobileCTA />
-              </>
-            } />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen">
+            <Routes>
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/" element={
+                <>
+                  <Header />
+                  <Hero />
+                  <HowItWorks />
+                  <WhyFieldCall />
+                  <DemoBanner />
+                  <Pricing />
+                  <Testimonials />
+                  <FAQ />
+                  <FinalCTA />
+                  <Footer />
+                  <StickyMobileCTA />
+                </>
+              } />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
