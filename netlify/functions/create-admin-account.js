@@ -39,13 +39,35 @@ exports.handler = async (event, context) => {
     const { email, password, secret } = requestData;
 
     // Check secret key
-    const SUPER_ADMIN_SECRET = process.env.SUPER_ADMIN_SECRET || 'your-super-secret-key-here';
+    const SUPER_ADMIN_SECRET = process.env.SUPER_ADMIN_SECRET;
+    
+    // Debug logging (remove in production)
+    console.log('Environment check:', {
+      hasSecret: !!SUPER_ADMIN_SECRET,
+      secretLength: SUPER_ADMIN_SECRET?.length || 0,
+      receivedSecret: secret,
+      match: secret === SUPER_ADMIN_SECRET
+    });
+    
+    if (!SUPER_ADMIN_SECRET) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'SUPER_ADMIN_SECRET environment variable not set' }),
+      };
+    }
     
     if (secret !== SUPER_ADMIN_SECRET) {
       return {
         statusCode: 401,
         headers,
-        body: JSON.stringify({ error: 'Invalid secret key' }),
+        body: JSON.stringify({ 
+          error: 'Invalid secret key',
+          debug: {
+            expected_length: SUPER_ADMIN_SECRET.length,
+            received_length: secret?.length || 0
+          }
+        }),
       };
     }
 
